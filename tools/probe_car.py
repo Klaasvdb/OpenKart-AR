@@ -13,7 +13,7 @@ import argparse
 import socket
 import urllib.request
 
-COMMON_TCP_PORTS = [80, 554, 7060, 8080, 8081, 8888, 9000, 6666, 7070, 5000]
+COMMON_TCP_PORTS = [23, 80, 554, 7060, 8080, 8081, 8888, 9000, 6666, 7070, 5000]
 HTTP_PATHS = ["/", "/?action=stream", "/video", "/stream", "/live", "/mjpeg", "/cgi-bin/stream"]
 
 
@@ -49,7 +49,9 @@ def main() -> None:
     ports = open_tcp_ports(args.host, COMMON_TCP_PORTS, args.timeout)
     print(f"  open: {ports or 'geen'}")
     for port in ports:
-        if port == 554:
+        if port == 23:
+            print(f"  Telnet open! probeer: telnet {args.host}  (vaak root zonder wachtwoord)")
+        elif port == 554:
             print(f"  RTSP? probeer: ffplay rtsp://{args.host}:554/")
         else:
             print(f"  HTTP op {port}:")

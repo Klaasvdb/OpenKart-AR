@@ -43,7 +43,7 @@ tegelijk verbonden zijn. Oplossingen, van eenvoudig naar robuust:
 |---|---|---|
 | **A. 4 USB-wifi-dongles** (aanbevolen) | Elke dongle verbindt met één auto. | Goedkoop (± €10/stuk). Omdat alle auto's hetzelfde IP hebben, moeten sockets aan een specifieke interface gebonden worden (`SO_BINDTODEVICE`, Linux) of gebruiken we per dongle een *network namespace*. Op Windows is dit erg lastig → Linux aangeraden. |
 | B. Kleine bridge per auto | Raspberry Pi Zero 2 W / ESP32 per auto die wifi-auto ↔ je thuisnetwerk doorgeeft. | Pc hoeft niet in de buurt; maar extra hardware, extra latency en meer 2,4 GHz-verkeer. |
-| C. Auto's in station-mode | Sommige auto's kunnen op je eigen router inloggen. | Zelden mogelijk bij deze goedkope modellen. |
+| C. Auto's in station-mode | Auto's loggen in op een router (zie hieronder). | **Voorkeur** als het lukt: geen dongles, elk een eigen IP. |
 
 Tips voor dongles:
 - Kies chipsets met goede Linux-driver (bv. MediaTek MT7601U / MT7612U, Realtek
@@ -52,6 +52,55 @@ Tips voor dongles:
   de antennes niet vlak naast elkaar zitten.
 - Zet je eigen thuiswifi en eventuele Steam Link op **5 GHz** of bekabeld,
   zodat 2,4 GHz vrij blijft voor de auto's.
+
+## Voorkeur: auto's laten inloggen op een netwerk (station-mode)
+
+De originele app hoeft niet te blijven werken. Als de auto's als *client*
+inloggen op een router in plaats van zelf een access point te zijn, krijgt
+elke auto een eigen IP en vervallen de dongles en `SO_BINDTODEVICE`. In de
+config laat je dan `interface` leeg en zet je per auto zijn eigen `host`.
+
+### Welke chip zit erin?
+
+Zonder openschroeven:
+
+1. **MAC-adres** van de auto opzoeken (verbinden met zijn wifi, dan `ip neigh`)
+   en de eerste 3 bytes via een "MAC vendor lookup" opzoeken.
+   - **Espressif** → ESP32: eigen firmware flashen kan (route 2).
+   - Beken, Jieli, Anyka, Ingenic, Allwinner, Realtek → route 1 of 3.
+2. **Telnet** (poort 23) open? `tools/probe_car.py` checkt dat. Sommige
+   Linux-camera's laten je zo binnen, soms zonder wachtwoord.
+
+Met de auto open: een foto van de print met leesbare chipopschriften.
+
+### Routes
+
+| Route | Wanneer | Moeilijkheid |
+|---|---|---|
+| **1. Config aanpassen** | Camera draait Linux en je komt erin (telnet/UART): wifi-config omzetten naar client-mode. | Makkelijk áls het kan, maar zeldzaam |
+| **2. Eigen firmware** | Chip is een ESP32: zelf firmware schrijven (wifi-client, MJPEG-stream, motoren aansturen). | Gemiddeld |
+| **3. Camerabordje vervangen** | Werkt altijd: ESP32-S3 + camera (± €10–15) in de plaats, die de bestaande motordriver aanstuurt (via de MCU over UART of direct met PWM). | Solderen, maar het meest betrouwbaar en volledig open source |
+
+Bij route 2 of 3 bepalen we zelf: stuurfrequentie, failsafe (stoppen bij
+signaalverlies), resolutie en batterijspanning terugsturen. Nadeel: de
+ESP32-camera haalt ongeveer 640×480, wat voor dit doel volstaat.
+
+### Netwerk voor het spel
+
+Gebruik een **apart routertje** (bv. een GL.iNet-reisrouter) in de
+woonkamer, met de pc er bekabeld aan. Zo belasten 4 videostreams je thuiswifi
+niet, is de setup meeneembaar, en mag de pc elders staan (dan wordt Steam Link
+ook realistischer, zie WEERGAVE.md).
+
+## Checklist als de auto's aankomen
+
+- [ ] Merk/model en app-naam noteren
+- [ ] Verbinden met de wifi van één auto, SSID en IP noteren
+- [ ] MAC-adres → chipfabrikant opzoeken
+- [ ] `python tools/probe_car.py <ip>` draaien (poorten, video, telnet)
+- [ ] Verkeer van de originele app opnemen met PCAPdroid (gas / links / rechts apart)
+- [ ] Foto van de printplaat (chips leesbaar)
+- [ ] Beslissen: route 1, 2 of 3 – of terugvallen op de dongles
 
 ## Gamepads
 
