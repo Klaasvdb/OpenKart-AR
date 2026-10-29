@@ -24,6 +24,7 @@ class App:
             total_laps=config.race.laps,
             countdown_seconds=config.race.countdown_seconds,
             base_max_throttle=config.race.base_max_throttle,
+            items_enabled=config.race.items,
         )
         for player in config.players:
             self.race.add_racer(player.name, player.car)
@@ -52,7 +53,7 @@ class App:
 
                 # 3. Input → (modified) commands → cars.
                 for player in self.config.players:
-                    cmd = self.race.command_for(player.car, pads.read(player.gamepad), now)
+                    cmd = self.race.handle_input(player.car, pads.read(player.gamepad), now)
                     self.links[player.car].send(cmd)
 
                 # 4. Render splitscreen + HUD from self.race.snapshot(now).

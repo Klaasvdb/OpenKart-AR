@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 class Gate:
     index: int
     marker_ids: frozenset[int]
+    # Driving through this gate gives an item (like the item boxes in Mario Kart).
+    item_box: bool = False
 
 
 @dataclass

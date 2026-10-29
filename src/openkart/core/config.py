@@ -35,6 +35,7 @@ class RaceConfig:
     laps: int = 3
     countdown_seconds: float = 3.0
     base_max_throttle: float = 0.7
+    items: bool = True
 
 
 @dataclass(frozen=True)
@@ -73,7 +74,7 @@ def parse(raw: dict) -> Config:
     track_raw = raw.get("track", {})
     track = Track(
         name=track_raw.get("name", "track"),
-        gates=[Gate(index=i, marker_ids=frozenset(g["markers"]))
+        gates=[Gate(index=i, marker_ids=frozenset(g["markers"]), item_box=g.get("item_box", False))
                for i, g in enumerate(track_raw.get("gates", []))],
         min_marker_px=track_raw.get("min_marker_px", 60),
     )

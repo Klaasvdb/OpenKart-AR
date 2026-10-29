@@ -1,7 +1,14 @@
 """Items a player can pick up and use. Each item turns into ControlModifiers.
 
-Pickup (driving through an "item box" marker) and targeting (who gets hit)
-are still to be designed; this module defines the shape.
+A racer gets an item by driving through a gate marked `item_box` while their
+single item slot is empty, and uses it with the item button. Who gets hit is
+decided by the item's target (see Race.use_item):
+
+- "self":   the user
+- "ahead":  the racer directly in front (misses when used in first place)
+- "others": everyone else still racing
+- "trap":   left behind at the gate the user just passed; the next other
+            racer to pass that gate gets hit
 """
 
 from __future__ import annotations

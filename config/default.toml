@@ -6,6 +6,8 @@ laps = 3
 countdown_seconds = 3
 # Normale maximale gas-stand; de rest is ruimte voor boosts.
 base_max_throttle = 0.7
+# false = pure race zonder items (bv. tijdrit of om de track te testen)
+items = true
 
 [display]
 width = 1920
@@ -45,12 +47,13 @@ gamepad = 1
 name = "Woonkamer"
 # Geordende poorten; elke poort herkent één of meer ArUco-id's.
 # Poort 0 is start/finish.
+# item_box = true: wie door deze poort rijdt krijgt een item (als zijn slot leeg is).
 # min_marker_px: marker moet minstens zo breed in beeld zijn om te tellen
 # (= auto is dichtbij genoeg).
 min_marker_px = 60
 gates = [
     { markers = [0, 1] },
-    { markers = [2, 3] },
+    { markers = [2, 3], item_box = true },
     { markers = [4, 5] },
     { markers = [6, 7] },
 ]
