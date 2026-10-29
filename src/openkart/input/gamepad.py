@@ -3,6 +3,9 @@
 Uses the SDL "game controller" mapping so Xbox, PlayStation, Switch and Steam
 Input pads all have the same layout: right trigger = gas, left trigger =
 brake/reverse, left stick = steering, A = item, Start = pause.
+
+For developing without controllers, the keyboard plays the first gamepad slot
+that has no pad: arrows = gas/brake/steer, space = item, Enter = start.
 """
 
 from __future__ import annotations
@@ -36,7 +39,9 @@ class Gamepads:
                      if controller.is_controller(i)]
 
     def read(self, index: int) -> PlayerInput:
-        if index >= len(self.pads):
+        if index == len(self.pads):
+            return self._keyboard()
+        if index > len(self.pads):
             return PlayerInput()
         pad = self.pads[index]
         pg = self._pg
@@ -48,4 +53,14 @@ class Gamepads:
             steering=apply_deadzone(axis(pg.CONTROLLER_AXIS_LEFTX)),
             use_item=bool(pad.get_button(pg.CONTROLLER_BUTTON_A)),
             pause=bool(pad.get_button(pg.CONTROLLER_BUTTON_START)),
+        )
+
+    def _keyboard(self) -> PlayerInput:
+        pg = self._pg
+        keys = pg.key.get_pressed()
+        return PlayerInput(
+            throttle=float(keys[pg.K_UP]) - float(keys[pg.K_DOWN]),
+            steering=float(keys[pg.K_RIGHT]) - float(keys[pg.K_LEFT]),
+            use_item=bool(keys[pg.K_SPACE]),
+            pause=bool(keys[pg.K_RETURN]),
         )

@@ -5,7 +5,8 @@ door je woonkamer, met splitscreen op de tv, rondetelling via geprinte
 markers en AR-items die het gedrag van je auto beïnvloeden.
 
 > Status: **skelet / ontwerpfase.** De spellogica (track, rondeteller, items,
-> race, splitscreen-layout) is geïmplementeerd en getest. De koppeling met de
+> race) en de weergave (splitscreen, HUD) zijn geïmplementeerd en getest; met
+> `--demo` draait het spel al zonder auto's. De koppeling met de
 > echte auto's wacht op het uitzoeken van hun protocol – zie
 > [docs/HARDWARE.md](docs/HARDWARE.md).
 
@@ -14,6 +15,7 @@ markers en AR-items die het gedrag van je auto beïnvloeden.
 - [docs/ARCHITECTUUR.md](docs/ARCHITECTUUR.md) – hoe de onderdelen samenwerken
 - [docs/HARDWARE.md](docs/HARDWARE.md) – auto's, wifi-dongles, protocol reverse-engineeren
 - [docs/WEERGAVE.md](docs/WEERGAVE.md) – tv, splitscreen en Steam Link
+- [docs/SPELONTWERP.md](docs/SPELONTWERP.md) – spelregels, items, open vragen
 
 ## Projectstructuur
 
@@ -24,8 +26,8 @@ src/openkart/
   cars/                    verbinding met de auto's (CarLink), simulator
   vision/                  ArUco-markerdetectie, camera-kalibratie
   input/                   gamepads → PlayerInput
-  game/                    spellogica zonder I/O (track, rondes, items, race)
-  render/                  splitscreen, HUD, AR-overlay
+  game/                    spellogica zonder I/O (track, rondes, items, race, events)
+  render/                  splitscreen, HUD, renderer (pygame), AR-overlay
   app.py                   hoofdloop
 tools/
   probe_car.py             onderzoek welke poorten/streams een auto heeft
@@ -53,6 +55,13 @@ pytest
 
 ```bash
 python -m openkart --check-config
+```
+
+Zonder auto's of camera spelen (testbeeld, toetsenbord = eerste speler zonder
+gamepad: pijltjes, spatie = item, Enter = start, Esc = stoppen):
+
+```bash
+python -m openkart --demo --windowed
 ```
 
 ## Roadmap

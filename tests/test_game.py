@@ -177,3 +177,13 @@ def test_default_config_loads():
     cfg = load(DEFAULT_CONFIG)
     assert len(cfg.track.gates) >= 2
     assert {p.car for p in cfg.players} <= {c.id for c in cfg.cars}
+
+
+def test_event_messages():
+    from openkart.game import events as ev
+    from openkart.render.hud import event_messages
+
+    names = {0: "A", 1: "B"}
+    msgs = event_messages(ev.Hit(1.0, 1, ItemKind.SHELL, by=0), names)
+    assert set(msgs) == {0, 1} and "A" in msgs[1]
+    assert event_messages(ev.GateCrossed(1.0, 0, 2), names) == {}

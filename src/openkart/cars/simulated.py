@@ -3,6 +3,9 @@
 Lets us build and test the whole game (markers, HUD, splitscreen) before the
 real car protocol is known. Hold printed markers in front of the webcam to
 "drive" through gates.
+
+`video_source = "pattern"` needs no camera at all: it draws a test image that
+reacts to the commands, handy for checking splitscreen and input.
 """
 
 from __future__ import annotations
@@ -35,6 +38,10 @@ class SimulatedCar(CarLink):
             self._thread.join(timeout=1)
 
     def _capture_loop(self) -> None:
+        if self.config.video_source == "pattern":
+            self._pattern_loop()
+            return
+
         import cv2
 
         source = self.config.video_source or "0"
@@ -51,3 +58,23 @@ class SimulatedCar(CarLink):
                 self._publish(VideoFrame(self.car_id, time.monotonic(), image, w, h))
         finally:
             cap.release()
+
+    def _pattern_loop(self, width: int = 640, height: int = 480, fps: float = 30.0) -> None:
+        """Horizon that tilts with steering and scrolls with throttle."""
+        import numpy as np
+
+        offset = 0.0
+        ys = np.arange(height)[:, None]
+        xs = np.arange(width)[None, :]
+        while self._running:
+            cmd = self.last_command
+            offset = (offset + cmd.throttle * 12) % 40
+            horizon = height / 2 + (xs - width / 2) * cmd.steering * 0.3
+            ground = ys > horizon
+            stripes = ((ys + offset) // 20 % 2).astype(bool) & ground
+            image = np.empty((height, width, 3), np.uint8)
+            image[:] = (200, 150, 90)  # sky (BGR)
+            image[ground] = (70, 70, 70)
+            image[stripes] = (95, 95, 95)
+            self._publish(VideoFrame(self.car_id, time.monotonic(), image, width, height))
+            time.sleep(1 / fps)

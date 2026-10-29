@@ -42,14 +42,21 @@ nodig, de auto "ziet" zelf waar hij is.
 | `cars/` | `CarLink`-interface + implementaties per protocol. `simulated` werkt met webcam of videobestand, zodat we zonder auto's kunnen ontwikkelen. | **Ja** – protocol nog te reverse-engineeren |
 | `vision/` | ArUco-markers detecteren in een frame, camera-kalibratie. | Nee (OpenCV) |
 | `input/` | Gamepads uitlezen en vertalen naar `PlayerInput`. | Nee (pygame) |
-| `game/` | Pure spellogica: track, rondeteller, items/modifiers, race-statemachine. **Geen I/O**, volledig testbaar. | Nee |
-| `render/` | Splitscreen-layout, HUD, AR-overlay. | Nee (pygame) |
+| `game/` | Pure spellogica: track, rondeteller, items/modifiers, race-statemachine, events. **Geen I/O**, volledig testbaar. | Nee |
+| `render/` | Splitscreen-layout, HUD-teksten (`hud.py`, zonder pygame), tekenen (`renderer.py`), AR-overlay. | Nee (pygame) |
 | `app.py` | Verbindt alles in één hoofdloop. | – |
 
 Belangrijk ontwerpprincipe: **`game/` weet niets van auto's, video of pygame.**
 Het krijgt `PlayerInput` en `MarkerSighting` binnen en geeft `ControlCommand` en
 een `RaceSnapshot` terug. Daardoor kunnen we alle regels unit-testen en later
 eventueel de renderer vervangen (bv. door Godot) zonder de spellogica te raken.
+
+## Events
+
+De `Race` houdt een lijst `RaceEvent`s bij (poort gepasseerd, ronde klaar,
+finish, item gekregen/gebruikt, geraakt). De app haalt ze elke tick op met
+`drain_events()` en zet ze om in meldingen op het scherm; later hangen geluid
+en een racelog hier ook aan. De spellogica zelf hangt nooit van events af.
 
 ## Threads / processen
 
