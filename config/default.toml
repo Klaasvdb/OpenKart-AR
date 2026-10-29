@@ -1,0 +1,56 @@
+# OpenKart AR configuratie.
+# Kopieer naar config/local.toml om lokaal aan te passen (staat in .gitignore).
+
+[race]
+laps = 3
+countdown_seconds = 3
+# Normale maximale gas-stand; de rest is ruimte voor boosts.
+base_max_throttle = 0.7
+
+[display]
+width = 1920
+height = 1080
+fullscreen = true
+
+# Eén blok per auto. `protocol` kiest de CarLink-implementatie:
+#   "simulated" = webcam / videobestand, voor ontwikkelen zonder auto's
+#   (later bv. "lewei", "wifi_ufo", … zodra het protocol bekend is)
+[[cars]]
+id = 0
+name = "Rood"
+protocol = "simulated"
+interface = "wlan1"      # wifi-dongle die met deze auto verbonden is
+host = "192.168.0.1"     # IP van de auto
+video_source = "0"       # alleen voor simulated: webcam-index of pad naar video
+
+[[cars]]
+id = 1
+name = "Blauw"
+protocol = "simulated"
+interface = "wlan2"
+host = "192.168.0.1"
+video_source = "0"
+
+[[players]]
+name = "Speler 1"
+car = 0
+gamepad = 0
+
+[[players]]
+name = "Speler 2"
+car = 1
+gamepad = 1
+
+[track]
+name = "Woonkamer"
+# Geordende poorten; elke poort herkent één of meer ArUco-id's.
+# Poort 0 is start/finish.
+# min_marker_px: marker moet minstens zo breed in beeld zijn om te tellen
+# (= auto is dichtbij genoeg).
+min_marker_px = 60
+gates = [
+    { markers = [0, 1] },
+    { markers = [2, 3] },
+    { markers = [4, 5] },
+    { markers = [6, 7] },
+]
