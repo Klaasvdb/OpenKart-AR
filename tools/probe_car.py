@@ -13,7 +13,9 @@ import argparse
 import socket
 import urllib.request
 
-COMMON_TCP_PORTS = [23, 80, 554, 7060, 8080, 8081, 8888, 9000, 6666, 7070, 5000]
+# Ports seen on cheap Wi-Fi drones/cars (Lewei, WiFi UFO, Hubsan, RTSP cams, …).
+COMMON_TCP_PORTS = [21, 23, 80, 554, 1234, 5000, 6666, 7060, 7070, 8060, 8080, 8081,
+                    8554, 8800, 8855, 8866, 8888, 9000, 20000, 40000, 50000]
 HTTP_PATHS = ["/", "/?action=stream", "/video", "/stream", "/live", "/mjpeg", "/cgi-bin/stream"]
 
 
@@ -41,7 +43,7 @@ def probe_http(host: str, port: int, timeout: float) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("host", help="IP of the car, often 192.168.0.1 or 192.168.1.1")
+    parser.add_argument("host", help="IP of the car, often 192.168.0.1, 192.168.1.1 or 192.168.169.1")
     parser.add_argument("--timeout", type=float, default=0.8)
     args = parser.parse_args()
 
